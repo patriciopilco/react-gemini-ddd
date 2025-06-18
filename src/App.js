@@ -163,7 +163,7 @@ const App = () => {
             };
 
             // API key (handled by Canvas environment)
-            const apiKey = "";
+            const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
             // Make the fetch call to the Gemini API
