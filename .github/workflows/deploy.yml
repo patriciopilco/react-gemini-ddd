@@ -1,0 +1,40 @@
+name: Deploy React App
+
+on:
+  push:
+    branches:
+      - main # Este workflow se ejecutará cuando se haga push a la rama 'main'
+
+jobs:
+  build_and_deploy_job: # Renombrado el job para mayor claridad
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Condición para ejecutar solo en push a main
+    runs-on: ubuntu-latest # El runner que ejecutará las acciones
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3 # Descarga tu código del repositorio
+
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v3 # Configura Node.js
+        with:
+          node-version: '20' # Define la versión de Node.js a usar
+
+      - name: Install dependencies
+        run: npm install # Instala las dependencias de tu proyecto React
+
+      - name: Build React App
+        run: npm run build # Compila tu aplicación React, generando la carpeta 'build'
+
+      - name: Deploy to Azure Static Web Apps
+        id: deploy_static_web_app # Un ID para este paso, útil si necesitas referenciar su salida
+        uses: Azure/static-web-apps-deploy@v1 # Acción oficial para desplegar en Azure Static Web Apps
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_SWA_GEMINIDDD_API_TOKEN }} # Token de despliegue, almacenado como secreto
+          app_location: "/" # La ubicación de tu código fuente de React (la raíz del repositorio)
+          api_location: "" # La ubicación de tu código de API (Azure Functions), déjalo vacío si no tienes API
+          output_location: "build" # La ubicación de los archivos compilados de tu aplicación React (después de 'npm run build')
+          action: "upload" # Añadido para intentar resolver el error "Missing required input action"
+          # Puedes añadir más configuraciones si tu Static Web App lo requiere, por ejemplo:
+          # production_branch: "main" # Especifica la rama de producción
+          # skip_app_build: false # Para evitar que Azure intente construir la app de nuevo si ya lo hiciste
+          # skip_api_build: false # Para evitar que Azure intente construir la API de nuevo
