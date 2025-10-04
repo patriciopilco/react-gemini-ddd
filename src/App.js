@@ -307,7 +307,7 @@ const App = () => {
                     </span>
                 </h1>
                 <p className="text-center text-gray-600 mb-8 text-lg">
-                    Generador de Arquitectura Domain-Driven Design con IA
+                    Generador de Arquitectura Domain-Driven Design
                 </p>
 
                 <div className="mb-6">

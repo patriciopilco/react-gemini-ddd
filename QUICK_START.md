@@ -16,7 +16,7 @@ Tu aplicación ha sido rebrandeada exitosamente de "Modelo del dominio" a **DDD 
 
 ### ✅ Textos y Títulos
 - [x] Título principal: "🏛️ DDD Xpert"
-- [x] Subtítulo: "Generador de Arquitectura Domain-Driven Design con IA"
+- [x] Subtítulo: "Generador de Arquitectura Domain-Driven Design"
 - [x] Meta description actualizada
 - [x] Manifest.json actualizado
 
@@ -48,7 +48,7 @@ Sin guía de branding
 ### Después
 ```
 Título: "🏛️ DDD Xpert"
-Subtítulo: "Generador de Arquitectura Domain-Driven Design con IA"
+Subtítulo: "Generador de Arquitectura Domain-Driven Design"
 Favicon: Logo personalizado con "D"
 Theme color: #1168bd (azul profesional)
 Landing page profesional

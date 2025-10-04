@@ -12,7 +12,7 @@ Tu aplicación ha sido exitosamente transformada a **DDD Xpert**, una marca prof
 ```
 Antes: "Modelo del dominio"
 Ahora: "🏛️ DDD Xpert"
-       "Generador de Arquitectura Domain-Driven Design con IA"
+       "Generador de Arquitectura Domain-Driven Design"
 ```
 
 ### Archivos Impactados

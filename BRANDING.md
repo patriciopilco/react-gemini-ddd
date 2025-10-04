@@ -152,7 +152,7 @@ public/
 
 ### Ejemplos de Copys
 - **Título**: "🏛️ DDD Xpert"
-- **Subtítulo**: "Generador de Arquitectura Domain-Driven Design con IA"
+- **Subtítulo**: "Generador de Arquitectura Domain-Driven Design"
 - **CTA**: "Generar Arquitectura DDD"
 - **Loading**: "Generando tu arquitectura DDD..."
 - **Error**: "¡Error! Por favor, intenta de nuevo"
@@ -162,7 +162,7 @@ public/
 ### Meta Tags
 ```html
 <title>DDD Xpert - Generador de Arquitectura DDD</title>
-<meta name="description" content="DDD Xpert - Generador de Arquitectura Domain-Driven Design con IA">
+<meta name="description" content="DDD Xpert - Generador de Arquitectura Domain-Driven Design">
 <meta name="theme-color" content="#1168bd">
 ```
 

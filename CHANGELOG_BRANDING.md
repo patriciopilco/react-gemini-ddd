@@ -13,14 +13,14 @@
 #### Nombre de la Aplicación
 - ✅ Cambiado de "Modelo del dominio" a **"DDD Xpert"**
 - ✅ Agregado emoji 🏛️ como símbolo distintivo
-- ✅ Subtítulo: "Generador de Arquitectura Domain-Driven Design con IA"
+- ✅ Subtítulo: "Generador de Arquitectura Domain-Driven Design"
 
 ### 2. Archivos Actualizados
 
 #### `public/index.html`
 ```html
 <title>DDD Xpert - Generador de Arquitectura DDD</title>
-<meta name="description" content="DDD Xpert - Generador de Arquitectura Domain-Driven Design con IA">
+<meta name="description" content="DDD Xpert - Generador de Arquitectura Domain-Driven Design">
 <meta name="theme-color" content="#1168bd">
 <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg">
 ```
@@ -43,7 +43,7 @@
     </span>
 </h1>
 <p className="text-center text-gray-600 mb-8 text-lg">
-    Generador de Arquitectura Domain-Driven Design con IA
+    Generador de Arquitectura Domain-Driven Design
 </p>
 ```
 
