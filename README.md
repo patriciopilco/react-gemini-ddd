@@ -1,6 +1,6 @@
-# Generador de Arquitectura DDD con React y Gemini AI
+# 🏛️ DDD Xpert - Generador de Arquitectura DDD
 
-Una aplicación React moderna que utiliza Gemini AI para generar automáticamente arquitecturas completas de Domain-Driven Design (DDD) a partir de casos de uso.
+**DDD Xpert** es una aplicación React moderna que utiliza Gemini AI para generar automáticamente arquitecturas completas de Domain-Driven Design (DDD) a partir de casos de uso. Convierte tus requisitos en diagramas C4 interactivos, bounded contexts, agregados y mucho más.
 
 ## 🚀 Características Principales
 
@@ -29,7 +29,18 @@ Una aplicación React moderna que utiliza Gemini AI para generar automáticament
   - ↔️ **Separate Ways**: Contextos independientes
   - 🤜🤛 **Partnership**: Asociación entre contextos
 
-### 4. **Diagrama de Componentes**
+### 4. **Diagramas C4 Interactivos con React Flow**
+- 🎨 **Diagrama C4 - Nivel de Contexto**: Visualización interactiva de bounded contexts y sus relaciones
+- 📦 **Diagrama C4 - Nivel de Contenedor**: Agregados, entidades, value objects y repositorios con conexiones visuales
+- 🔧 **Diagrama C4 - Nivel de Componente**: Componentes técnicos con dependencias e interacciones
+- Características interactivas:
+  - Zoom y pan para explorar los diagramas
+  - Minimapa para navegación rápida
+  - Nodos arrastrables para reorganizar visualmente
+  - Layout automático con algoritmo Dagre
+  - Animaciones en las conexiones
+
+### 5. **Diagrama de Componentes por Capas**
 - Visualización de la arquitectura técnica organizada por capas:
   - 🖥️ **Capa de Presentación**: Controllers, Views, UI Components
   - ⚙️ **Capa de Aplicación**: Servicios de aplicación que coordinan el flujo
@@ -37,7 +48,7 @@ Una aplicación React moderna que utiliza Gemini AI para generar automáticament
   - 🗄️ **Capa de Infraestructura**: Repositorios, APIs, Base de datos
 - Componentes con sus responsabilidades y dependencias
 
-### 5. **Análisis Completo de DDD**
+### 6. **Análisis Completo de DDD**
 - Identificación de Servicios de Dominio
 - Servicios de Aplicación
 - Eventos de Dominio

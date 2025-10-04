@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "DDD Xpert",
+  "name": "DDD Xpert - Generador de Arquitectura Domain-Driven Design",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#1168bd",
   "background_color": "#ffffff"
 }

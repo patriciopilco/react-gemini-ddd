@@ -1,0 +1,99 @@
+/* Estilos adicionales para los diagramas C4 con React Flow */
+
+.react-flow {
+    background: #f8f9fa;
+}
+
+.react-flow__node {
+    font-family: 'Inter', sans-serif;
+    cursor: grab;
+}
+
+.react-flow__node:active {
+    cursor: grabbing;
+}
+
+.react-flow__edge-path {
+    stroke-width: 2;
+}
+
+.react-flow__edge-text {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.react-flow__minimap {
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.react-flow__controls {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.react-flow__controls-button {
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.react-flow__controls-button:hover {
+    background-color: #f0f0f0;
+}
+
+/* Estilos para los nodos de agregados */
+.aggregate-node {
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #1168bd;
+    background: linear-gradient(135deg, #1168bd 0%, #0d4d8c 100%);
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para los nodos de contexto */
+.context-node {
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid #0d4d8c;
+    background: #1168bd;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para nodos de componentes */
+.component-node {
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s;
+}
+
+.component-node:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Animaciones para las aristas */
+@keyframes dashdraw {
+    from {
+        stroke-dashoffset: 10;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.react-flow__edge.animated path {
+    animation: dashdraw 0.5s linear infinite;
+    stroke-dasharray: 5;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .react-flow__node {
+        font-size: 10px;
+    }
+    
+    .react-flow__edge-text {
+        font-size: 9px;
+    }
+}

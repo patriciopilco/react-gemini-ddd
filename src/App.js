@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react'; // Import useEffect
 import DiagramLegend from './components/DiagramLegend';
+import C4ContextDiagram from './components/C4ContextDiagram';
+import C4ContainerDiagram from './components/C4ContainerDiagram';
+import C4ComponentDiagram from './components/C4ComponentDiagram';
+import './components/C4Diagrams.css';
 
 // Main App component
 const App = () => {
@@ -297,11 +301,14 @@ const App = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 p-8 flex items-center justify-center font-sans">
             <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-4xl border border-gray-200">
-                <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-8 tracking-tight">
+                <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-4 tracking-tight">
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
-                        Modelo del dominio
+                        🏛️ DDD Xpert
                     </span>
                 </h1>
+                <p className="text-center text-gray-600 mb-8 text-lg">
+                    Generador de Arquitectura Domain-Driven Design con IA
+                </p>
 
                 <div className="mb-6">
                     <label htmlFor="useCases" className="block text-lg font-semibold text-gray-700 mb-2">
@@ -630,6 +637,80 @@ const App = () => {
                                         <div><span className="font-semibold">🤜🤛 Partnership:</span> Asociación entre contextos</div>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {/* C4 Context Diagram */}
+                        {dddArchitecture.contextMaps && dddArchitecture.boundedContexts && (
+                            <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md border-2 border-blue-200">
+                                <h3 className="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                    </svg>
+                                    Diagrama C4 - Nivel de Contexto
+                                </h3>
+                                <p className="text-gray-700 mb-4 italic">
+                                    Vista de alto nivel de los bounded contexts y sus relaciones
+                                </p>
+                                <C4ContextDiagram data={{
+                                    contextMap: {
+                                        boundedContexts: dddArchitecture.boundedContexts,
+                                        relationships: dddArchitecture.contextMaps.map((map, idx) => ({
+                                            from: dddArchitecture.boundedContexts.findIndex(c => c.name === map.upstreamContext),
+                                            to: dddArchitecture.boundedContexts.findIndex(c => c.name === map.downstreamContext),
+                                            pattern: map.pattern,
+                                            type: map.pattern
+                                        }))
+                                    }
+                                }} />
+                            </div>
+                        )}
+
+                        {/* C4 Container Diagram */}
+                        {dddArchitecture.boundedContexts && (
+                            <div className="mt-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg shadow-md border-2 border-purple-200">
+                                <h3 className="text-2xl font-bold text-purple-800 mb-4 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                    Diagrama C4 - Nivel de Contenedor
+                                </h3>
+                                <p className="text-gray-700 mb-4 italic">
+                                    Agregados, entidades, value objects y repositorios
+                                </p>
+                                <C4ContainerDiagram data={{
+                                    aggregates: dddArchitecture.boundedContexts.flatMap(ctx => ctx.aggregates || []),
+                                    repositories: dddArchitecture.boundedContexts.flatMap(ctx => 
+                                        (ctx.aggregates || []).map(agg => ({
+                                            name: agg.repository,
+                                            aggregateRoot: agg.rootEntity
+                                        }))
+                                    )
+                                }} />
+                            </div>
+                        )}
+
+                        {/* C4 Component Diagram with React Flow */}
+                        {dddArchitecture.componentDiagram && dddArchitecture.componentDiagram.layers && (
+                            <div className="mt-8 p-6 bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg shadow-md border-2 border-gray-300">
+                                <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
+                                    </svg>
+                                    Diagrama C4 - Nivel de Componente
+                                </h3>
+                                <p className="text-gray-700 mb-4 italic">
+                                    Componentes técnicos y sus dependencias
+                                </p>
+                                <C4ComponentDiagram data={{
+                                    components: dddArchitecture.componentDiagram.layers.flatMap(layer => 
+                                        (layer.components || []).map(comp => ({
+                                            ...comp,
+                                            layer: layer.name,
+                                            description: `${layer.name}: ${comp.type}`
+                                        }))
+                                    )
+                                }} />
                             </div>
                         )}
 
