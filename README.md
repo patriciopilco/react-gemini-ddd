@@ -1,70 +1,173 @@
-# Getting Started with Create React App
+# Generador de Arquitectura DDD con React y Gemini AI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Una aplicación React moderna que utiliza Gemini AI para generar automáticamente arquitecturas completas de Domain-Driven Design (DDD) a partir de casos de uso.
 
-## Available Scripts
+## 🚀 Características Principales
 
-In the project directory, you can run:
+### 1. **Diagramas de Entidades Completos**
+- Visualización detallada de Agregados con su estructura interna
+- Identificación de Entidades Raíz (Root Entities)
+- Listado de Entidades con sus atributos
+- Objetos de Valor (Value Objects) con sus propiedades
+- Repositorios asociados a cada agregado
 
-### `npm start`
+### 2. **Bounded Contexts Explicados**
+- Descripción detallada de cada Contexto Delimitado
+- Responsabilidades específicas de cada contexto
+- Relación con el dominio general del sistema
+- Lenguaje Ubicuo (Ubiquitous Language) con términos y definiciones
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 3. **Context Maps (Mapas de Contexto)**
+- Visualización de las relaciones entre Bounded Contexts
+- Patrones de integración implementados:
+  - 🤝 **Shared Kernel**: Kernel compartido entre contextos
+  - 👥 **Customer-Supplier**: Relación cliente-proveedor
+  - 🙇 **Conformist**: Downstream se conforma al upstream
+  - 🛡️ **Anticorruption Layer**: Capa anticorrupción
+  - 🌐 **Open Host Service**: Servicio de host abierto
+  - 📝 **Published Language**: Lenguaje publicado
+  - ↔️ **Separate Ways**: Contextos independientes
+  - 🤜🤛 **Partnership**: Asociación entre contextos
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 4. **Análisis Completo de DDD**
+- Identificación de Servicios de Dominio
+- Servicios de Aplicación
+- Eventos de Dominio
+- Vista general del dominio del sistema
 
-### `npm test`
+## 📋 Requisitos Previos
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (versión 14 o superior)
+- npm o yarn
+- Clave API de Google Gemini AI
 
-### `npm run build`
+## 🔧 Instalación
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clona el repositorio:
+```bash
+git clone https://github.com/patriciopilco/react-gemini-ddd.git
+cd react-gemini-ddd
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Instala las dependencias:
+```bash
+npm install
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Crea un archivo `.env` en la raíz del proyecto:
+```env
+REACT_APP_GEMINI_API_KEY=tu_clave_api_aqui
+```
 
-### `npm run eject`
+4. Inicia la aplicación:
+```bash
+npm start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+La aplicación se abrirá en [http://localhost:3000](http://localhost:3000)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 💡 Uso
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+1. **Ingresa los Casos de Uso**: Describe los casos de uso o requisitos de tu sistema en el área de texto.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+   Ejemplo:
+   ```
+   - Un usuario puede registrarse en el sistema
+   - Un cliente puede crear un nuevo pedido
+   - El sistema debe procesar pagos con tarjeta de crédito
+   - Un administrador puede gestionar productos
+   - El sistema debe enviar notificaciones por email
+   ```
 
-## Learn More
+2. **Genera la Arquitectura**: Haz clic en "Generar Arquitectura DDD"
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+3. **Explora los Resultados**: La aplicación mostrará:
+   - Vista general del dominio
+   - Bounded Contexts con sus componentes
+   - Diagramas de agregados, entidades y value objects
+   - Mapas de contexto con patrones de integración
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🏗️ Estructura del Proyecto
 
-### Code Splitting
+```
+react-gemini-ddd/
+├── public/
+│   ├── index.html
+│   └── ...
+├── src/
+│   ├── components/
+│   │   └── DiagramLegend.js    # Leyenda de símbolos del diagrama
+│   ├── App.js                   # Componente principal
+│   ├── App.css
+│   ├── index.js
+│   └── ...
+├── .env                         # Variables de entorno (no incluido en repo)
+├── package.json
+└── README.md
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 🎨 Tecnologías Utilizadas
 
-### Analyzing the Bundle Size
+- **React 19.1.0**: Framework de UI
+- **Tailwind CSS**: Framework de estilos (CDN)
+- **Google Gemini AI**: Modelo de IA para generación de arquitectura
+- **Google Fonts (Inter)**: Tipografía moderna
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📚 Conceptos DDD Implementados
 
-### Making a Progressive Web App
+### Bounded Context (Contexto Delimitado)
+Un límite explícito dentro del cual un modelo de dominio particular es válido.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Aggregate (Agregado)
+Un cluster de objetos de dominio que pueden tratarse como una única unidad.
 
-### Advanced Configuration
+### Entity (Entidad)
+Un objeto que tiene identidad única y es rastreado a través de su ciclo de vida.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Value Object (Objeto de Valor)
+Un objeto inmutable que describe características del dominio pero no tiene identidad propia.
 
-### Deployment
+### Repository (Repositorio)
+Un mecanismo para encapsular el almacenamiento, recuperación y búsqueda de agregados.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Context Map (Mapa de Contexto)
+Una representación visual de las relaciones entre diferentes Bounded Contexts.
 
-### `npm run build` fails to minify
+## 🔐 Seguridad
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Nunca compartas tu clave API de Gemini
+- El archivo `.env` está incluido en `.gitignore`
+- Las claves API deben mantenerse seguras en variables de entorno
+
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas. Por favor:
+
+1. Haz fork del proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📝 Licencia
+
+Este proyecto está bajo la Licencia MIT.
+
+## 👨‍💻 Autor
+
+**Patricio Pilco**
+- GitHub: [@patriciopilco](https://github.com/patriciopilco)
+
+## 🙏 Agradecimientos
+
+- Google Gemini AI por proporcionar la API de IA
+- La comunidad de Domain-Driven Design
+- Create React App por el template base
+
+## 📞 Soporte
+
+Si tienes preguntas o necesitas ayuda, por favor abre un issue en el repositorio de GitHub.
+
+---
+
+**¡Feliz modelado de dominios! 🎉**
