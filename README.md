@@ -29,7 +29,15 @@ Una aplicación React moderna que utiliza Gemini AI para generar automáticament
   - ↔️ **Separate Ways**: Contextos independientes
   - 🤜🤛 **Partnership**: Asociación entre contextos
 
-### 4. **Análisis Completo de DDD**
+### 4. **Diagrama de Componentes**
+- Visualización de la arquitectura técnica organizada por capas:
+  - 🖥️ **Capa de Presentación**: Controllers, Views, UI Components
+  - ⚙️ **Capa de Aplicación**: Servicios de aplicación que coordinan el flujo
+  - 🏛️ **Capa de Dominio**: Lógica de negocio, entidades, agregados
+  - 🗄️ **Capa de Infraestructura**: Repositorios, APIs, Base de datos
+- Componentes con sus responsabilidades y dependencias
+
+### 5. **Análisis Completo de DDD**
 - Identificación de Servicios de Dominio
 - Servicios de Aplicación
 - Eventos de Dominio

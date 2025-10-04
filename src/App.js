@@ -59,7 +59,7 @@ const App = () => {
 
         try {
             // Prompt for the AI model
-            const prompt = `Analiza los siguientes casos de uso y define una arquitectura completa de Diseño Orientado a Dominio (DDD).
+            const prompt = `Analiza los siguientes casos de uso y define una arquitectura completa de Diseño Orientado a Dominio (DDD) EN ESPAÑOL.
             Identifica:
             - Contextos Delimitados (Bounded Contexts) con su propósito y responsabilidades
             - Lenguaje Ubicuo (Ubiquitous Language) para cada contexto (término y definición)
@@ -77,8 +77,11 @@ const App = () => {
               * Published Language: lenguaje publicado
               * Separate Ways: contextos completamente independientes
               * Partnership: asociación entre contextos
+            - Diagrama de Componentes: identifica los componentes técnicos del sistema (Controllers, Services, Repositories, etc.) 
+              y sus dependencias, organizados por capas (Presentación, Aplicación, Dominio, Infraestructura)
             - Explicación de cómo cada bounded context se relaciona con el dominio general
 
+            IMPORTANTE: Todas las respuestas deben estar completamente en ESPAÑOL.
             Asegúrate de que la salida sea un JSON válido siguiendo el esquema proporcionado.
             Casos de Uso:
             ${useCases}`;
@@ -207,9 +210,39 @@ const App = () => {
                             },
                             "propertyOrdering": ["upstreamContext", "downstreamContext", "pattern", "description"]
                         }
+                    },
+                    "componentDiagram": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "layers": {
+                                "type": "ARRAY",
+                                "items": {
+                                    "type": "OBJECT",
+                                    "properties": {
+                                        "name": { "type": "STRING" },
+                                        "description": { "type": "STRING" },
+                                        "components": {
+                                            "type": "ARRAY",
+                                            "items": {
+                                                "type": "OBJECT",
+                                                "properties": {
+                                                    "name": { "type": "STRING" },
+                                                    "type": { "type": "STRING" },
+                                                    "responsibilities": { "type": "ARRAY", "items": { "type": "STRING" } },
+                                                    "dependencies": { "type": "ARRAY", "items": { "type": "STRING" } }
+                                                },
+                                                "propertyOrdering": ["name", "type", "responsibilities", "dependencies"]
+                                            }
+                                        }
+                                    },
+                                    "propertyOrdering": ["name", "description", "components"]
+                                }
+                            }
+                        },
+                        "propertyOrdering": ["layers"]
                     }
                 },
-                "propertyOrdering": ["domainOverview", "boundedContexts", "contextMaps"]
+                "propertyOrdering": ["domainOverview", "boundedContexts", "contextMaps", "componentDiagram"]
             };
 
 
@@ -272,7 +305,7 @@ const App = () => {
 
                 <div className="mb-6">
                     <label htmlFor="useCases" className="block text-lg font-semibold text-gray-700 mb-2">
-                        Describe tus casos de uso o requisitos (en español):
+                        Describe tus casos de uso o requisitos del sistema:
                     </label>
                     <textarea
                         id="useCases"
@@ -320,7 +353,7 @@ const App = () => {
                 {dddArchitecture && (
                     <div className="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200">
                         <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-                            Arquitectura DDD Sugerida
+                            Resultados del Análisis DDD
                         </h2>
 
                         {/* Domain Overview */}
@@ -595,6 +628,101 @@ const App = () => {
                                         <div><span className="font-semibold">📝 Published Language:</span> Lenguaje publicado</div>
                                         <div><span className="font-semibold">↔️ Separate Ways:</span> Contextos independientes</div>
                                         <div><span className="font-semibold">🤜🤛 Partnership:</span> Asociación entre contextos</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Component Diagram */}
+                        {dddArchitecture.componentDiagram && dddArchitecture.componentDiagram.layers && dddArchitecture.componentDiagram.layers.length > 0 && (
+                            <div className="mt-8 p-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg shadow-md border-2 border-orange-200">
+                                <h3 className="text-2xl font-bold text-orange-800 mb-4 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 mr-2 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                    Diagrama de Componentes
+                                </h3>
+                                <p className="text-gray-700 mb-6 italic">
+                                    Arquitectura técnica del sistema organizada por capas
+                                </p>
+                                
+                                <div className="space-y-6">
+                                    {dddArchitecture.componentDiagram.layers.map((layer, layerIndex) => {
+                                        // Define colors for each layer
+                                        const layerStyles = {
+                                            'Presentación': { bg: 'bg-blue-50', border: 'border-blue-400', text: 'text-blue-800', icon: '🖥️' },
+                                            'Aplicación': { bg: 'bg-green-50', border: 'border-green-400', text: 'text-green-800', icon: '⚙️' },
+                                            'Dominio': { bg: 'bg-purple-50', border: 'border-purple-400', text: 'text-purple-800', icon: '🏛️' },
+                                            'Infraestructura': { bg: 'bg-gray-50', border: 'border-gray-400', text: 'text-gray-800', icon: '🗄️' }
+                                        };
+                                        
+                                        const style = layerStyles[layer.name] || { bg: 'bg-amber-50', border: 'border-amber-400', text: 'text-amber-800', icon: '📦' };
+                                        
+                                        return (
+                                            <div key={layerIndex} className={`${style.bg} p-5 rounded-lg border-2 ${style.border} shadow-sm`}>
+                                                <div className="mb-4 pb-3 border-b-2 border-opacity-30" style={{borderColor: 'currentColor'}}>
+                                                    <div className="flex items-center mb-2">
+                                                        <span className="text-2xl mr-2">{style.icon}</span>
+                                                        <h4 className={`text-xl font-bold ${style.text}`}>
+                                                            Capa de {layer.name}
+                                                        </h4>
+                                                    </div>
+                                                    <p className="text-gray-700 text-sm ml-9">{layer.description}</p>
+                                                </div>
+                                                
+                                                {layer.components && layer.components.length > 0 && (
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        {layer.components.map((component, compIndex) => (
+                                                            <div key={compIndex} className="bg-white p-4 rounded-md border border-gray-300 shadow-sm hover:shadow-md transition-shadow duration-200">
+                                                                <div className="mb-3 pb-2 border-b border-gray-200">
+                                                                    <p className={`font-bold ${style.text} text-lg`}>
+                                                                        {component.name}
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-600 font-semibold uppercase mt-1">
+                                                                        {component.type}
+                                                                    </p>
+                                                                </div>
+                                                                
+                                                                {component.responsibilities && component.responsibilities.length > 0 && (
+                                                                    <div className="mb-3">
+                                                                        <p className="text-sm font-semibold text-gray-700 mb-1">Responsabilidades:</p>
+                                                                        <ul className="list-disc list-inside text-xs text-gray-600 space-y-1">
+                                                                            {component.responsibilities.map((resp, respIndex) => (
+                                                                                <li key={respIndex}>{resp}</li>
+                                                                            ))}
+                                                                        </ul>
+                                                                    </div>
+                                                                )}
+                                                                
+                                                                {component.dependencies && component.dependencies.length > 0 && (
+                                                                    <div className="mt-3 pt-2 border-t border-gray-200">
+                                                                        <p className="text-sm font-semibold text-gray-700 mb-1">Dependencias:</p>
+                                                                        <div className="flex flex-wrap gap-1">
+                                                                            {component.dependencies.map((dep, depIndex) => (
+                                                                                <span key={depIndex} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded border border-gray-300">
+                                                                                    {dep}
+                                                                                </span>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Layer Architecture Legend */}
+                                <div className="mt-6 p-4 bg-white rounded-lg border border-orange-300">
+                                    <h4 className="font-semibold text-orange-800 mb-3">Arquitectura en Capas:</h4>
+                                    <div className="space-y-2 text-sm">
+                                        <div><span className="font-semibold">🖥️ Presentación:</span> Componentes de interfaz de usuario (Controllers, Views, UI Components)</div>
+                                        <div><span className="font-semibold">⚙️ Aplicación:</span> Servicios de aplicación que coordinan el flujo de trabajo</div>
+                                        <div><span className="font-semibold">🏛️ Dominio:</span> Lógica de negocio, entidades, agregados y servicios de dominio</div>
+                                        <div><span className="font-semibold">🗄️ Infraestructura:</span> Implementaciones técnicas (Repositorios, APIs externas, Base de datos)</div>
                                     </div>
                                 </div>
                             </div>
