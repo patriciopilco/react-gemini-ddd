@@ -53,12 +53,16 @@ const C4ContainerDiagram = ({ data }) => {
         if (!data || !data.aggregates) return [];
 
         const nodes = [];
-        let nodeId = 1;
+        const nodeIdMap = new Map(); // Mapa para rastrear IDs de agregados
 
-        // Agregar agregados
-        data.aggregates?.forEach((aggregate) => {
+        // Agregar agregados y sus componentes
+        data.aggregates?.forEach((aggregate, aggIndex) => {
+            const aggregateId = `aggregate-${aggIndex}`;
+            nodeIdMap.set(aggregate.name, aggregateId);
+            
+            // Agregar nodo del agregado
             nodes.push({
-                id: `aggregate-${nodeId}`,
+                id: aggregateId,
                 type: 'default',
                 data: {
                     label: (
@@ -84,10 +88,9 @@ const C4ContainerDiagram = ({ data }) => {
             });
 
             // Agregar entidades del agregado
-            aggregate.entities?.forEach((entity) => {
-                nodeId++;
+            aggregate.entities?.forEach((entity, entityIndex) => {
                 nodes.push({
-                    id: `entity-${nodeId}`,
+                    id: `entity-${aggIndex}-${entityIndex}`,
                     type: 'default',
                     data: {
                         label: (
@@ -104,7 +107,6 @@ const C4ContainerDiagram = ({ data }) => {
                     position: { x: 0, y: 0 },
                     width: 160,
                     height: 70,
-                    parentNode: `aggregate-${nodeId - aggregate.entities.indexOf(entity)}`,
                     style: {
                         background: CONTAINER_COLORS.entity,
                         color: 'white',
@@ -116,10 +118,9 @@ const C4ContainerDiagram = ({ data }) => {
             });
 
             // Agregar value objects
-            aggregate.valueObjects?.forEach((vo) => {
-                nodeId++;
+            aggregate.valueObjects?.forEach((vo, voIndex) => {
                 nodes.push({
-                    id: `vo-${nodeId}`,
+                    id: `vo-${aggIndex}-${voIndex}`,
                     type: 'default',
                     data: {
                         label: (
@@ -145,14 +146,15 @@ const C4ContainerDiagram = ({ data }) => {
                     },
                 });
             });
-
-            nodeId++;
         });
 
         // Agregar repositorios
-        data.repositories?.forEach((repo) => {
+        data.repositories?.forEach((repo, repoIndex) => {
+            const repoId = `repo-${repoIndex}`;
+            nodeIdMap.set(repo.name, repoId);
+            
             nodes.push({
-                id: `repo-${nodeId}`,
+                id: repoId,
                 type: 'default',
                 data: {
                     label: (
@@ -176,32 +178,38 @@ const C4ContainerDiagram = ({ data }) => {
                     borderRadius: '8px',
                 },
             });
-            nodeId++;
         });
 
         return nodes;
     }, [data]);
 
     const initialEdges = useMemo(() => {
-        if (!data) return [];
+        if (!data || !data.aggregates || !data.repositories) return [];
 
         const edges = [];
-        let edgeId = 1;
+        let edgeId = 0;
 
         // Crear relaciones entre agregados y repositorios
         data.aggregates?.forEach((aggregate, aggIndex) => {
             data.repositories?.forEach((repo, repoIndex) => {
-                if (repo.aggregateRoot === aggregate.name || 
-                    repo.name.includes(aggregate.name) ||
-                    aggregate.name.includes(repo.name.replace('Repository', ''))) {
+                // Intentar relacionar repositorio con agregado
+                const repoNameLower = (repo.name || '').toLowerCase();
+                const aggNameLower = (aggregate.name || '').toLowerCase();
+                const aggRootLower = (repo.aggregateRoot || '').toLowerCase();
+                
+                if (aggRootLower === aggNameLower || 
+                    repoNameLower.includes(aggNameLower) ||
+                    aggNameLower.includes(repoNameLower.replace('repository', '').replace('repo', ''))) {
                     edges.push({
                         id: `edge-${edgeId}`,
-                        source: `aggregate-${aggIndex + 1}`,
-                        target: `repo-${data.aggregates.length + repoIndex + 1}`,
+                        source: `aggregate-${aggIndex}`,
+                        target: `repo-${repoIndex}`,
                         label: 'persiste',
                         type: 'smoothstep',
+                        animated: false,
                         style: { stroke: '#ed8936', strokeWidth: 2 },
                         labelStyle: { fill: '#ed8936', fontWeight: 600, fontSize: 10 },
+                        labelBgStyle: { fill: '#fff', fillOpacity: 0.9 },
                         markerEnd: {
                             type: MarkerType.ArrowClosed,
                             color: '#ed8936',
