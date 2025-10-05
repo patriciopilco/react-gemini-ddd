@@ -787,7 +787,7 @@ const App = () => {
                                 <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
                                     🗂️ Estructuras de Microservicios (Scaffolds)
                                 </h3>
-                                <p className="text-gray-700 mb-4 italic">Estructura generada por la IA para cada microservicio (árbol ASCII).</p>
+                                <p className="text-gray-700 mb-4 italic">Estructura generada para cada microservicio (Propuesta).</p>
 
                                 <div className="space-y-4">
                                     {dddArchitecture.serviceScaffolds.map((sc, si) => (
