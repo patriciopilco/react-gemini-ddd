@@ -280,7 +280,70 @@ const App = () => {
                 const jsonText = result.candidates[0].content.parts[0].text;
                 try {
                     const parsedJson = JSON.parse(jsonText);
-                    setDddArchitecture(parsedJson);
+
+                    // Si la IA no devuelve microservices explícitamente, inferir una propuesta básica
+                    const inferMicroservicesFromDomain = (arch) => {
+                        if (!arch) return [];
+                        const microservices = [];
+
+                        const contexts = arch.boundedContexts || [];
+                        contexts.forEach((ctx, idx) => {
+                            const svc = {
+                                name: ctx.name || `service-${idx}`,
+                                responsibilities: ctx.responsibilities || [],
+                                dataOwnership: [],
+                                publicAPIs: [],
+                                eventsPublished: [],
+                                eventsSubscribed: [],
+                                persistence: []
+                            };
+
+                            // Cada agregado en el contexto puede ser candidato a un microservicio o a un conjunto de endpoints
+                            (ctx.aggregates || []).forEach((agg) => {
+                                // ownership: el contexto posee los datos del agregado
+                                if (agg && agg.name) svc.dataOwnership.push(agg.name);
+
+                                // si el agregado tiene un repo, exponer API CRUD sugerida
+                                if (agg && agg.repository) {
+                                    svc.persistence.push(agg.repository);
+                                    svc.publicAPIs.push({ method: 'GET', path: `/${agg.name.toLowerCase()}`, description: `Obtener lista de ${agg.name}` });
+                                    svc.publicAPIs.push({ method: 'POST', path: `/${agg.name.toLowerCase()}`, description: `Crear ${agg.name}` });
+                                    svc.publicAPIs.push({ method: 'GET', path: `/${agg.name.toLowerCase()}/{id}`, description: `Obtener ${agg.name} por id` });
+                                }
+
+                                // events: buscar eventos relacionados en el contexto
+                                (ctx.domainEvents || []).forEach((ev) => {
+                                    if (ev && ev.name) {
+                                        svc.eventsPublished.push(ev.name);
+                                    }
+                                });
+                            });
+
+                            // Deducción simple: si el contexto menciona "pagos" o "payments", sugiere pub/sub
+                            const nameLower = (ctx.name || '').toLowerCase();
+                            if (nameLower.includes('pago') || nameLower.includes('payment')) {
+                                svc.eventsPublished.push('PaymentProcessed');
+                            }
+
+                            // Deduplicar arreglos
+                            svc.dataOwnership = Array.from(new Set(svc.dataOwnership));
+                            svc.persistence = Array.from(new Set(svc.persistence));
+                            svc.eventsPublished = Array.from(new Set(svc.eventsPublished));
+
+                            microservices.push(svc);
+                        });
+
+                        return microservices;
+                    };
+
+                    const normalized = parsedJson; // asume que ya tiene la estructura prevista
+
+                    // Si no vienen microservices, inferir uno por bounded context
+                    if (!normalized.microservices || normalized.microservices.length === 0) {
+                        normalized.microservices = inferMicroservicesFromDomain(normalized);
+                    }
+
+                    setDddArchitecture(normalized);
                 } catch (jsonError) {
                     setError('Error al analizar la respuesta JSON de la IA. Inténtalo de nuevo.');
                     console.error('JSON parsing error:', jsonError, 'Raw JSON:', jsonText);
@@ -636,6 +699,69 @@ const App = () => {
                                         <div><span className="font-semibold">↔️ Separate Ways:</span> Contextos independientes</div>
                                         <div><span className="font-semibold">🤜🤛 Partnership:</span> Asociación entre contextos</div>
                                     </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Microservices proposal inferred from domain model */}
+                        {dddArchitecture.microservices && dddArchitecture.microservices.length > 0 && (
+                            <div className="mt-8 p-6 bg-gradient-to-r from-indigo-50 to-sky-50 rounded-lg shadow-md border-2 border-indigo-200">
+                                <h3 className="text-2xl font-bold text-indigo-800 mb-4 flex items-center">
+                                    🧩 Arquitectura de Microservicios (Propuesta)
+                                </h3>
+                                <p className="text-gray-700 mb-4 italic">Propuesta generada a partir del modelo de dominio.</p>
+
+                                <div className="space-y-4">
+                                    {dddArchitecture.microservices.map((svc, sIndex) => (
+                                        <div key={sIndex} className="bg-white p-4 rounded-lg border border-indigo-100 shadow-sm">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <p className="font-bold text-indigo-700">{svc.name}</p>
+                                                <span className="text-sm text-gray-500">{svc.persistence && svc.persistence.length > 0 ? svc.persistence.join(', ') : 'Sin persistencia sugerida'}</span>
+                                            </div>
+
+                                            {svc.responsibilities && svc.responsibilities.length > 0 && (
+                                                <div className="mb-2">
+                                                    <p className="font-semibold text-gray-700 text-sm">Responsabilidades:</p>
+                                                    <ul className="list-disc list-inside text-sm text-gray-600">
+                                                        {svc.responsibilities.map((r, ri) => <li key={ri}>{r}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {svc.dataOwnership && svc.dataOwnership.length > 0 && (
+                                                <div className="mb-2">
+                                                    <p className="font-semibold text-gray-700 text-sm">Propiedad de datos:</p>
+                                                    <div className="flex flex-wrap gap-2 mt-1">
+                                                        {svc.dataOwnership.map((d, di) => (
+                                                            <span key={di} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-100">{d}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {svc.publicAPIs && svc.publicAPIs.length > 0 && (
+                                                <div className="mb-2">
+                                                    <p className="font-semibold text-gray-700 text-sm">APIs públicas sugeridas:</p>
+                                                    <ul className="text-sm text-gray-600 list-disc list-inside">
+                                                        {svc.publicAPIs.map((api, ai) => (
+                                                            <li key={ai}><span className="font-semibold">{api.method}</span> {api.path} — {api.description}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {svc.eventsPublished && svc.eventsPublished.length > 0 && (
+                                                <div className="mb-1">
+                                                    <p className="font-semibold text-gray-700 text-sm">Eventos publicados:</p>
+                                                    <div className="flex flex-wrap gap-2 mt-1">
+                                                        {svc.eventsPublished.map((ev, ei) => (
+                                                            <span key={ei} className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100">{ev}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}
