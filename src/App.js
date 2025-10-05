@@ -62,33 +62,40 @@ const App = () => {
         setDddArchitecture(null); // Clear previous results
 
         try {
-            // Prompt for the AI model
-            const prompt = `Analiza los siguientes casos de uso y define una arquitectura completa de Diseño Orientado a Dominio (DDD) EN ESPAÑOL.
-            Identifica:
-            - Contextos Delimitados (Bounded Contexts) con su propósito y responsabilidades
-            - Lenguaje Ubicuo (Ubiquitous Language) para cada contexto (término y definición)
-            - Agregados (Aggregates) con su Entidad Raíz (Root Entity), Entidades, Objetos de Valor (Value Objects) y Repositorios
-            - Relaciones entre entidades dentro de cada agregado
-            - Servicios de Dominio (Domain Services)
-            - Servicios de Aplicación (Application Services)
-            - Eventos de Dominio (Domain Events)
-            - Mapas de Contexto (Context Maps) con patrones de integración entre bounded contexts:
-              * Shared Kernel: kernel compartido entre contextos
-              * Customer-Supplier: relación cliente-proveedor
-              * Conformist: el contexto downstream se conforma al upstream
-              * Anticorruption Layer: capa anticorrupción
-              * Open Host Service: servicio de host abierto
-              * Published Language: lenguaje publicado
-              * Separate Ways: contextos completamente independientes
-              * Partnership: asociación entre contextos
-            - Diagrama de Componentes: identifica los componentes técnicos del sistema (Controllers, Services, Repositories, etc.) 
-              y sus dependencias, organizados por capas (Presentación, Aplicación, Dominio, Infraestructura)
-            - Explicación de cómo cada bounded context se relaciona con el dominio general
+                        // Prompt mejorado para el modelo AI (en ESPAÑOL). Devuelve SOLO JSON válido.
+                        const prompt = `Analiza los siguientes requisitos y casos de uso (en ESPAÑOL) y devuelve exclusivamente un JSON válido UTF-8 que represente el modelo de dominio siguiendo Domain-Driven Design (DDD).
 
-            IMPORTANTE: Todas las respuestas deben estar completamente en ESPAÑOL.
-            Asegúrate de que la salida sea un JSON válido siguiendo el esquema proporcionado.
-            Casos de Uso:
-            ${useCases}`;
+                        OBJETIVO: identificar con precisión, por cada Bounded Context, los siguientes elementos: Entidades, Objetos de Valor, Agregados, Repositorios, Servicios de Dominio, Eventos de Dominio y el Lenguaje Ubicuo. Además, proponer Context Map y una propuesta de microservicios.
+
+                        ESTRUCTURA QUE DEBE INCLUIR EL JSON (campos mínimos; usa arrays vacíos si algo no aplica):
+                        - boundedContexts: [ { name, purpose, ubiquitousLanguage: [{term,definition}], aggregates: [ { name, rootEntity, entities:[{name,id,attributes,invariants,relationships}], valueObjects:[{name,properties}], repositories:[{name,contracts,aggregateRoot}], invariants } ], domainServices:[{name,responsibility,methodSignatures}], domainEvents:[{name,trigger,payloadSchema}], applicationServices:[{name,useCases:[{name,input,output,sideEffects}]}], componentsByLayer:{presentation:[],application:[],domain:[],infrastructure:[]} } ]
+                        - contextMap: [ { fromContext, toContext, pattern, direction, justification, technicalRecommendation } ]
+                        - microservices: [ { name, responsibilities, dataOwnership, publicAPIs:[{method,path,description}], eventsPublished, eventsSubscribed, persistence } ]
+                        - notes (opcional)
+
+                        REQUISITOS IMPORTANTES:
+                        1) Devuelve SOLO JSON (sin texto explicativo extra). El JSON debe cumplir la estructura descrita.
+                        2) Usa términos consistentes en el Lenguaje Ubicuo a lo largo del JSON.
+                        3) Si algo es ambiguo en los requisitos, añade un campo 'ambiguities' en el bounded context correspondiente con preguntas concretas para clarificar.
+                        4) Para cada relación entre bounded contexts incluye una recomendación técnica (por ejemplo: "usar API REST /contracts con versión v1" o "publicar evento OrderPlaced en el bus de eventos").
+                        5) Prioriza identificar invariantes y reglas de negocio que indiquen límites transaccionales (candidatos a agregados).
+
+                        HEURÍSTICAS QUE DEBES APLICAR (no las incluyas en la salida):
+                        - Entidad: sustantivo con identidad propia y ciclo de vida; suele tener id y reglas invariantes.
+                        - Objeto de Valor: concepto definido por propiedades inmutables y comparación por valor (ej. Money, Address).
+                        - Agregado: conjunto de entidades/VO con una raíz que garantiza invariantes; busca frases como "debe mantenerse consistente".
+                        - Servicio de Dominio: operación que no pertenece a una sola entidad/VO y cruza límites de modelo.
+                        - Evento de Dominio: hecho pasado que ya ocurrió (nombres tipo PastTense o sufijos como "Placed", "Created" o frases "se ha"/"ha sido").
+
+                        CONTRATO (entrada/salida):
+                        - Input: texto en ESPAÑOL con casos de uso y reglas de negocio (campo 'Casos de Uso' que se incorpora abajo).
+                        - Output: JSON válido siguiendo la estructura descrita.
+                        - Error esperado: si el input está vacío, devuelve { "error": "input vacío" }.
+
+                        Casos de Uso / Requisitos:
+                        ${useCases}
+
+                        FIN. Recuerda: la respuesta debe ser exclusivamente JSON válido sin texto adicional.`;
 
             // Chat history for the Gemini API call
             let chatHistory = [];
@@ -280,7 +287,105 @@ const App = () => {
                 const jsonText = result.candidates[0].content.parts[0].text;
                 try {
                     const parsedJson = JSON.parse(jsonText);
-                    setDddArchitecture(parsedJson);
+
+                    // Normalizar la estructura para manejar variantes en la respuesta de la IA
+                    const normalizeArchitecture = (arch) => {
+                        if (!arch || typeof arch !== 'object') return arch;
+
+                        const normalized = { ...arch };
+
+                        // Ensure boundedContexts is an array
+                        if (Array.isArray(normalized.boundedContexts)) {
+                            normalized.boundedContexts = normalized.boundedContexts.map((ctx) => {
+                                const c = { ...ctx };
+
+                                // Ensure aggregates is an array
+                                if (!Array.isArray(c.aggregates)) {
+                                    // try alternative keys
+                                    if (Array.isArray(c.aggregate)) c.aggregates = c.aggregate;
+                                    else c.aggregates = [];
+                                }
+
+                                c.aggregates = c.aggregates.map((agg) => {
+                                    const a = { ...agg };
+
+                                    // Normalize entities: can be array of strings or objects
+                                    if (!Array.isArray(a.entities)) {
+                                        if (Array.isArray(a.entity)) a.entities = a.entity;
+                                        else if (a.entities === undefined) a.entities = [];
+                                        else a.entities = [a.entities];
+                                    }
+                                    a.entities = a.entities.map((ent) => {
+                                        if (!ent) return { name: '', attributes: [] };
+                                        if (typeof ent === 'string') return { name: ent, attributes: [] };
+                                        // If entity provided as object, normalize attributes key
+                                        const entObj = { ...ent };
+                                        if (!Array.isArray(entObj.attributes)) {
+                                            if (Array.isArray(entObj.attrs)) entObj.attributes = entObj.attrs;
+                                            else if (Array.isArray(entObj.properties)) entObj.attributes = entObj.properties;
+                                            else if (typeof entObj.attributes === 'string') entObj.attributes = [entObj.attributes];
+                                            else entObj.attributes = entObj.attributes || [];
+                                        }
+                                        return entObj;
+                                    });
+
+                                    // Normalize value objects: accept many shapes
+                                    if (!Array.isArray(a.valueObjects)) {
+                                        if (Array.isArray(a.value_objects)) a.valueObjects = a.value_objects;
+                                        else if (Array.isArray(a.valueObject)) a.valueObjects = a.valueObject;
+                                        else if (a.valueObject && typeof a.valueObject === 'string') a.valueObjects = [a.valueObject];
+                                        else if (a.valueObjects === undefined) a.valueObjects = [];
+                                        else a.valueObjects = [a.valueObjects];
+                                    }
+
+                                    a.valueObjects = a.valueObjects.map((vo) => {
+                                        if (!vo) return { name: '', properties: [] };
+                                        if (typeof vo === 'string') return { name: vo, properties: [] };
+                                        const voObj = { ...vo };
+                                        // Normalize properties key
+                                        if (!Array.isArray(voObj.properties)) {
+                                            if (Array.isArray(voObj.props)) voObj.properties = voObj.props;
+                                            else if (Array.isArray(voObj.attributes)) voObj.properties = voObj.attributes;
+                                            else if (typeof voObj.properties === 'string') voObj.properties = [voObj.properties];
+                                            else voObj.properties = voObj.properties || [];
+                                        }
+                                        // If the AI sometimes nests a VO inside an entity-like shape, try to get a name
+                                        if (!voObj.name) {
+                                            if (voObj.type) voObj.name = voObj.type;
+                                            else if (voObj.label) voObj.name = voObj.label;
+                                        }
+                                        return voObj;
+                                    });
+
+                                    // Normalize repository: could be named 'repository' or 'repositories'
+                                    if (!a.repository && Array.isArray(a.repositories) && a.repositories.length > 0) {
+                                        // take first repository name if provided as array
+                                        const firstRepo = a.repositories[0];
+                                        a.repository = typeof firstRepo === 'string' ? firstRepo : firstRepo.name || '';
+                                    }
+
+                                    return a;
+                                });
+
+                                return c;
+                            });
+                        }
+
+                        return normalized;
+                    };
+
+                    const normalized = normalizeArchitecture(parsedJson);
+
+                    // Log if valueObjects were not found anywhere (helps debugging)
+                    const hasValueObjects = (normalized.boundedContexts || []).some(ctx => (
+                        (ctx.aggregates || []).some(agg => (agg.valueObjects && agg.valueObjects.length > 0))
+                    ));
+                    if (!hasValueObjects) {
+                        console.warn('No se detectaron valueObjects después de normalizar la respuesta de la IA. Revisa la respuesta cruda para más detalles.');
+                        console.debug('Raw AI JSON:', parsedJson);
+                    }
+
+                    setDddArchitecture(normalized);
                 } catch (jsonError) {
                     setError('Error al analizar la respuesta JSON de la IA. Inténtalo de nuevo.');
                     console.error('JSON parsing error:', jsonError, 'Raw JSON:', jsonText);
