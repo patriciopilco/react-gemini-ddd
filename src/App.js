@@ -781,6 +781,32 @@ const App = () => {
                             </div>
                         )}
 
+                        {/* Service scaffolds (ASCII trees per microservice) */}
+                        {dddArchitecture.serviceScaffolds && dddArchitecture.serviceScaffolds.length > 0 && (
+                            <div className="mt-8 p-6 bg-gradient-to-r from-gray-50 to-white rounded-lg shadow-md border-2 border-gray-200">
+                                <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                                    🗂️ Estructuras de Microservicios (Scaffolds)
+                                </h3>
+                                <p className="text-gray-700 mb-4 italic">Estructura generada por la IA para cada microservicio (árbol ASCII).</p>
+
+                                <div className="space-y-4">
+                                    {dddArchitecture.serviceScaffolds.map((sc, si) => (
+                                        <div key={si} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <p className="font-bold text-gray-800">{sc.name}</p>
+                                                <span className="text-sm text-gray-500">Estructura ASCII</span>
+                                            </div>
+                                            <div className="overflow-auto max-h-72">
+                                                <pre className="whitespace-pre-wrap text-xs bg-black text-green-200 p-3 rounded">
+{sc.scaffold}
+                                                </pre>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* C4 Context Diagram */}
                         {dddArchitecture.contextMaps && dddArchitecture.boundedContexts && (
                             <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md border-2 border-blue-200">
