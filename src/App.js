@@ -62,33 +62,40 @@ const App = () => {
         setDddArchitecture(null); // Clear previous results
 
         try {
-            // Prompt for the AI model
-            const prompt = `Analiza los siguientes casos de uso y define una arquitectura completa de Diseño Orientado a Dominio (DDD) EN ESPAÑOL.
-            Identifica:
-            - Contextos Delimitados (Bounded Contexts) con su propósito y responsabilidades
-            - Lenguaje Ubicuo (Ubiquitous Language) para cada contexto (término y definición)
-            - Agregados (Aggregates) con su Entidad Raíz (Root Entity), Entidades, Objetos de Valor (Value Objects) y Repositorios
-            - Relaciones entre entidades dentro de cada agregado
-            - Servicios de Dominio (Domain Services)
-            - Servicios de Aplicación (Application Services)
-            - Eventos de Dominio (Domain Events)
-            - Mapas de Contexto (Context Maps) con patrones de integración entre bounded contexts:
-              * Shared Kernel: kernel compartido entre contextos
-              * Customer-Supplier: relación cliente-proveedor
-              * Conformist: el contexto downstream se conforma al upstream
-              * Anticorruption Layer: capa anticorrupción
-              * Open Host Service: servicio de host abierto
-              * Published Language: lenguaje publicado
-              * Separate Ways: contextos completamente independientes
-              * Partnership: asociación entre contextos
-            - Diagrama de Componentes: identifica los componentes técnicos del sistema (Controllers, Services, Repositories, etc.) 
-              y sus dependencias, organizados por capas (Presentación, Aplicación, Dominio, Infraestructura)
-            - Explicación de cómo cada bounded context se relaciona con el dominio general
+                        // Prompt mejorado para el modelo AI (en ESPAÑOL). Devuelve SOLO JSON válido.
+                        const prompt = `Analiza los siguientes requisitos y casos de uso (en ESPAÑOL) y devuelve exclusivamente un JSON válido UTF-8 que represente el modelo de dominio siguiendo Domain-Driven Design (DDD).
 
-            IMPORTANTE: Todas las respuestas deben estar completamente en ESPAÑOL.
-            Asegúrate de que la salida sea un JSON válido siguiendo el esquema proporcionado.
-            Casos de Uso:
-            ${useCases}`;
+                        OBJETIVO: identificar con precisión, por cada Bounded Context, los siguientes elementos: Entidades, Objetos de Valor, Agregados, Repositorios, Servicios de Dominio, Eventos de Dominio y el Lenguaje Ubicuo. Además, proponer Context Map y una propuesta de microservicios.
+
+                        ESTRUCTURA QUE DEBE INCLUIR EL JSON (campos mínimos; usa arrays vacíos si algo no aplica):
+                        - boundedContexts: [ { name, purpose, ubiquitousLanguage: [{term,definition}], aggregates: [ { name, rootEntity, entities:[{name,id,attributes,invariants,relationships}], valueObjects:[{name,properties}], repositories:[{name,contracts,aggregateRoot}], invariants } ], domainServices:[{name,responsibility,methodSignatures}], domainEvents:[{name,trigger,payloadSchema}], applicationServices:[{name,useCases:[{name,input,output,sideEffects}]}], componentsByLayer:{presentation:[],application:[],domain:[],infrastructure:[]} } ]
+                        - contextMap: [ { fromContext, toContext, pattern, direction, justification, technicalRecommendation } ]
+                        - microservices: [ { name, responsibilities, dataOwnership, publicAPIs:[{method,path,description}], eventsPublished, eventsSubscribed, persistence } ]
+                        - notes (opcional)
+
+                        REQUISITOS IMPORTANTES:
+                        1) Devuelve SOLO JSON (sin texto explicativo extra). El JSON debe cumplir la estructura descrita.
+                        2) Usa términos consistentes en el Lenguaje Ubicuo a lo largo del JSON.
+                        3) Si algo es ambiguo en los requisitos, añade un campo 'ambiguities' en el bounded context correspondiente con preguntas concretas para clarificar.
+                        4) Para cada relación entre bounded contexts incluye una recomendación técnica (por ejemplo: "usar API REST /contracts con versión v1" o "publicar evento OrderPlaced en el bus de eventos").
+                        5) Prioriza identificar invariantes y reglas de negocio que indiquen límites transaccionales (candidatos a agregados).
+
+                        HEURÍSTICAS QUE DEBES APLICAR (no las incluyas en la salida):
+                        - Entidad: sustantivo con identidad propia y ciclo de vida; suele tener id y reglas invariantes.
+                        - Objeto de Valor: concepto definido por propiedades inmutables y comparación por valor (ej. Money, Address).
+                        - Agregado: conjunto de entidades/VO con una raíz que garantiza invariantes; busca frases como "debe mantenerse consistente".
+                        - Servicio de Dominio: operación que no pertenece a una sola entidad/VO y cruza límites de modelo.
+                        - Evento de Dominio: hecho pasado que ya ocurrió (nombres tipo PastTense o sufijos como "Placed", "Created" o frases "se ha"/"ha sido").
+
+                        CONTRATO (entrada/salida):
+                        - Input: texto en ESPAÑOL con casos de uso y reglas de negocio (campo 'Casos de Uso' que se incorpora abajo).
+                        - Output: JSON válido siguiendo la estructura descrita.
+                        - Error esperado: si el input está vacío, devuelve { "error": "input vacío" }.
+
+                        Casos de Uso / Requisitos:
+                        ${useCases}
+
+                        FIN. Recuerda: la respuesta debe ser exclusivamente JSON válido sin texto adicional.`;
 
             // Chat history for the Gemini API call
             let chatHistory = [];
