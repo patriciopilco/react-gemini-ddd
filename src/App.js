@@ -62,33 +62,37 @@ const App = () => {
         setDddArchitecture(null); // Clear previous results
 
         try {
-            // Prompt for the AI model
-            const prompt = `Analiza los siguientes casos de uso y define una arquitectura completa de Diseño Orientado a Dominio (DDD) EN ESPAÑOL.
-            Identifica:
-            - Contextos Delimitados (Bounded Contexts) con su propósito y responsabilidades
-            - Lenguaje Ubicuo (Ubiquitous Language) para cada contexto (término y definición)
-            - Agregados (Aggregates) con su Entidad Raíz (Root Entity), Entidades, Objetos de Valor (Value Objects) y Repositorios
-            - Relaciones entre entidades dentro de cada agregado
-            - Servicios de Dominio (Domain Services)
-            - Servicios de Aplicación (Application Services)
-            - Eventos de Dominio (Domain Events)
-            - Mapas de Contexto (Context Maps) con patrones de integración entre bounded contexts:
-              * Shared Kernel: kernel compartido entre contextos
-              * Customer-Supplier: relación cliente-proveedor
-              * Conformist: el contexto downstream se conforma al upstream
-              * Anticorruption Layer: capa anticorrupción
-              * Open Host Service: servicio de host abierto
-              * Published Language: lenguaje publicado
-              * Separate Ways: contextos completamente independientes
-              * Partnership: asociación entre contextos
-            - Diagrama de Componentes: identifica los componentes técnicos del sistema (Controllers, Services, Repositories, etc.) 
-              y sus dependencias, organizados por capas (Presentación, Aplicación, Dominio, Infraestructura)
-            - Explicación de cómo cada bounded context se relaciona con el dominio general
+                        // Prompt for the AI model
+                        const prompt = `Analiza los siguientes casos de uso y define una arquitectura completa de Diseño Orientado a Dominio (DDD) EN ESPAÑOL.
+                        Para CADA microservicio propuesto, organiza la SOLUCIÓN DE CÓDIGO en CAPAS bien definidas y separadas (Presentation, Application, Domain, Infrastructure) con responsabilidades claras y ejemplos de artefactos/archivos sugeridos.
+                        Utiliza el siguiente esquema de capas por microservicio:
 
-            IMPORTANTE: Todas las respuestas deben estar completamente en ESPAÑOL.
-            Asegúrate de que la salida sea un JSON válido siguiendo el esquema proporcionado.
-            Casos de Uso:
-            ${useCases}`;
+                        ┌────────────────────────────┐
+                        │        Presentation        │  → Interfaz (API REST, UI, CLI). Indica endpoints, controllers y archivos (ej: presentation/api.js, presentation/controllers/*.js)
+                        ├────────────────────────────┤
+                        │     Application Layer      │  → Casos de uso (servicios de aplicación). Indica use-cases, servicios de aplicación y archivos (ej: application/useCases.js)
+                        ├────────────────────────────┤
+                        │       Domain Layer         │  → Entidades, agregados, repositorios (interfaces), reglas de negocio. Indica clases/arquitectura de agregados y archivos (ej: domain/entities.js, domain/repositories.js)
+                        ├────────────────────────────┤
+                        │    Infrastructure Layer    │  → Persistencia, frameworks, adapters. Indica adaptadores de BD, clientes externos y archivos (ej: infrastructure/repository.js, infrastructure/events.js)
+                        └────────────────────────────┘
+
+                        Requisitos:
+                        - PARA CADA microservicio, devuelve: nombre, responsabilidades cortas, propiedad de datos (dataOwnership), APIs públicas sugeridas (método/path/descr), eventos publicados, persistencia sugerida y una sección llamada "layers" que describa, para cada capa (Presentation, Application, Domain, Infrastructure), los componentes o artefactos recomendados con nombres de archivo sugeridos.
+                        - Mantén la salida en ESPAÑOL y devuelve JSON válido que cumpla estrictamente el esquema proporcionado.
+                        - No agregues texto fuera del JSON.
+
+                        Además del modelado DDD habitual, incluye:
+                        - Contextos Delimitados (Bounded Contexts) con su propósito y responsabilidades
+                        - Lenguaje Ubicuo (Ubiquitous Language) para cada contexto
+                        - Agregados con Entidad Raíz, Entidades, Objetos de Valor y Repositorios (nombres y archivos sugeridos)
+                        - Servicios de Dominio y Servicios de Aplicación
+                        - Eventos de Dominio
+                        - Mapas de Contexto con patrones de integración (Shared Kernel, Customer-Supplier, Conformist, Anticorruption Layer, Open Host Service, Published Language, Separate Ways, Partnership)
+                        - Diagrama de Componentes por capas
+
+                        Casos de Uso:
+                        ${useCases}`;
 
             // Chat history for the Gemini API call
             let chatHistory = [];
@@ -245,8 +249,47 @@ const App = () => {
                         },
                         "propertyOrdering": ["layers"]
                     }
+                    ,
+                    "microservices": {
+                        "type": "ARRAY",
+                        "items": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "name": { "type": "STRING" },
+                                "responsibilities": { "type": "ARRAY", "items": { "type": "STRING" } },
+                                "dataOwnership": { "type": "ARRAY", "items": { "type": "STRING" } },
+                                "publicAPIs": { "type": "ARRAY", "items": { "type": "OBJECT", "properties": { "method": { "type": "STRING" }, "path": { "type": "STRING" }, "description": { "type": "STRING" } }, "propertyOrdering": ["method","path","description"] } },
+                                "eventsPublished": { "type": "ARRAY", "items": { "type": "STRING" } },
+                                "persistence": { "type": "ARRAY", "items": { "type": "STRING" } },
+                                "layers": {
+                                    "type": "ARRAY",
+                                    "items": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "name": { "type": "STRING" },
+                                            "components": {
+                                                "type": "ARRAY",
+                                                "items": {
+                                                    "type": "OBJECT",
+                                                    "properties": {
+                                                        "name": { "type": "STRING" },
+                                                        "type": { "type": "STRING" },
+                                                        "responsibilities": { "type": "ARRAY", "items": { "type": "STRING" } },
+                                                        "suggestedFiles": { "type": "ARRAY", "items": { "type": "STRING" } }
+                                                    },
+                                                    "propertyOrdering": ["name","type","responsibilities","suggestedFiles"]
+                                                }
+                                            }
+                                        },
+                                        "propertyOrdering": ["name","components"]
+                                    }
+                                }
+                            },
+                            "propertyOrdering": ["name","responsibilities","dataOwnership","publicAPIs","eventsPublished","persistence","layers"]
+                        }
+                    }
                 },
-                "propertyOrdering": ["domainOverview", "boundedContexts", "contextMaps", "componentDiagram"]
+                "propertyOrdering": ["domainOverview", "boundedContexts", "microservices", "contextMaps", "componentDiagram"]
             };
 
 
