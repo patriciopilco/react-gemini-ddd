@@ -1,6 +1,7 @@
 {
   "name": "react-app-ddd",
-  "version": "0.1.0",
+  "version": "2.0.0",
+  "description": "Generador híbrido de arquitecturas DDD con análisis estructurado (Gemini) y asistente conversacional (Claude)",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.0",

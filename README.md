@@ -1,6 +1,35 @@
 # 🏛️ DDD Xpert - Generador de Arquitectura DDD
 
-**DDD Xpert** es una aplicación React moderna que utiliza Gemini AI para generar automáticamente arquitecturas completas de Domain-Driven Design (DDD) a partir de casos de uso. Convierte tus requisitos en diagramas C4 interactivos, bounded contexts, agregados y mucho más.
+**DDD Xpert** es una aplicación React moderna que combina **dos modos poderosos**:
+
+1. **📊 Análisis Estructurado**: Utiliza Gemini AI para generar automáticamente arquitecturas completas de Domain-Driven Design (DDD)
+2. **💬 Asistente Conversacional**: Chat con experto en DDD usando Claude Sonnet
+
+Convierte tus requisitos en diagramas C4 interactivos, bounded contexts, agregados y mucho más.
+
+---
+
+## 🎯 Dos Modos Complementarios
+
+### 📊 Análisis Estructurado (Gemini)
+Análisis profundo y riguroso de arquitecturas DDD con visualizaciones interactivas:
+- ✅ Diagramas C4 completos (Contexto, Contenedor, Componentes)
+- ✅ Agregados con estructura visual
+- ✅ Bounded Contexts con responsabilidades
+- ✅ Context Maps y patrones de integración
+- ✅ Scaffolds automáticos de microservicios
+
+### 💬 Asistente Conversacional (Claude)
+Chat educativo para explorar y refinar diseños DDD:
+- ✅ Conversación natural y flexible
+- ✅ Plantillas descargables
+- ✅ Prompts sugeridos
+- ✅ Exporta conversación como Markdown
+- ✅ Ideal para aprendizaje e iteración
+
+**→ Ver guía completa en [HYBRID_ARCHITECTURE.md](./HYBRID_ARCHITECTURE.md)**
+
+---
 
 ## 🚀 Características Principales
 
@@ -47,6 +76,7 @@
   - 🏛️ **Capa de Dominio**: Lógica de negocio, entidades, agregados
   - 🗄️ **Capa de Infraestructura**: Repositorios, APIs, Base de datos
 - Componentes con sus responsabilidades y dependencias
+
 
 ### 6. **Análisis Completo de DDD**
 - Identificación de Servicios de Dominio

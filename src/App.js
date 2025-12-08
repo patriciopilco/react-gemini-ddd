@@ -3,10 +3,13 @@ import DiagramLegend from './components/DiagramLegend';
 import C4ContextDiagram from './components/C4ContextDiagram';
 import C4ContainerDiagram from './components/C4ContainerDiagram';
 import C4ComponentDiagram from './components/C4ComponentDiagram';
+import ArquitectoDDDAgent from './components/ArquitectoDDDAgent';
 import './components/C4Diagrams.css';
 
 // Main App component
 const App = () => {
+    // State to control which mode is active
+    const [mode, setMode] = useState('analysis');
     // State to store the user's input use cases
     const [useCases, setUseCases] = useState('');
     // State to store the generated DDD architecture
@@ -377,16 +380,48 @@ const App = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 p-8 flex items-center justify-center font-sans">
-            <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-4xl border border-gray-200">
-                <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-4 tracking-tight">
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
-                        🏛️ DDD Xpert
-                    </span>
-                </h1>
-                <p className="text-center text-gray-600 mb-8 text-lg">
-                    Generador de Arquitectura Domain-Driven Design
-                </p>
+        <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 p-8 font-sans">
+            {/* Mode Selector */}
+            <div className="flex justify-center mb-8">
+                <div className="flex gap-4 bg-white rounded-lg shadow-lg p-2">
+                    <button
+                        onClick={() => setMode('analysis')}
+                        className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                            mode === 'analysis'
+                                ? 'bg-gradient-to-r from-blue-600 to-teal-500 text-white shadow-lg'
+                                : 'text-gray-700 hover:bg-gray-100'
+                        }`}
+                    >
+                        📊 Análisis Estructurado
+                    </button>
+                    <button
+                        onClick={() => setMode('agent')}
+                        className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                            mode === 'agent'
+                                ? 'bg-gradient-to-r from-blue-600 to-teal-500 text-white shadow-lg'
+                                : 'text-gray-700 hover:bg-gray-100'
+                        }`}
+                    >
+                        💬 Asistente Conversacional
+                    </button>
+                </div>
+            </div>
+
+            {/* Agent Mode */}
+            {mode === 'agent' && <ArquitectoDDDAgent />}
+
+            {/* Analysis Mode */}
+            {mode === 'analysis' && (
+            <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+                <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-4xl border border-gray-200">
+                    <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-4 tracking-tight">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
+                            🏛️ DDD Xpert
+                        </span>
+                    </h1>
+                    <p className="text-center text-gray-600 mb-8 text-lg">
+                        Generador de Arquitectura Domain-Driven Design
+                    </p>
 
                 <div className="mb-6">
                     <label htmlFor="useCases" className="block text-lg font-semibold text-gray-700 mb-2">
@@ -977,7 +1012,9 @@ const App = () => {
                         )}
                     </div>
                 )}
+                </div>
             </div>
+            )}
         </div>
     );
 };
